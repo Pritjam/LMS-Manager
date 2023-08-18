@@ -98,7 +98,7 @@ async def list_queues(ctx):
 @client.event
 async def on_command_error(ctx, error):
     if isinstance(error, commands.errors.CheckFailure):
-        await ctx.send('You do not have the correct role for this command. Must be an admin to invoke.')
+        await ctx.send('You do not have the correct role for this command. Must be an administrator to invoke.')
 
 
 client.run(TOKEN)
