@@ -70,7 +70,7 @@ async def execute_queues(ctx):
     CREATE_QUEUE.clear()
 
 @client.command(name="dqa", help="Adds role(s) to the delete queue. Multiple roles can be specified in a comment separated list.")
-@commands.has_role("Administrator")
+@commands.has_permissions(administrator = True)
 async def add_del_role(ctx, *, roles : str):
     role_ids = []
     roles = roles.split(",")
@@ -84,14 +84,14 @@ async def add_del_role(ctx, *, roles : str):
     await ctx.send("Added role(s) %s to delete queue" % ["<@&" + str(id) + ">" for id in role_ids])
 
 @client.command(name="cqa", help="Adds role(s) to the create queue. Multiple roles can be specified in a comment separated list.")
-@commands.has_role("Administrator")
+@commands.has_permissions(administrator = True)
 async def add_create_role(ctx, *, roles : str):
     roles = [role_name.strip(" \n\t") for role_name in roles.split(',')]
     CREATE_QUEUE.update(roles)
     await ctx.send("Added role(s) `%s` to create queue" % roles)
 
 @client.command(name="list", help="Displays the delete and create queues")
-@commands.has_role("Administrator")
+@commands.has_permissions(administrator = True)
 async def list_queues(ctx):
     await ctx.send("To delete: %s\n To create: %s" % (["<@&" + str(id) + ">" for id in DELETE_QUEUE], str(CREATE_QUEUE)))
 
