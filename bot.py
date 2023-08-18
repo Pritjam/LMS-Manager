@@ -15,20 +15,20 @@ client = commands.Bot(intents=intents, command_prefix="*")
 
 
 @client.command(name="clear_delete_queue", help="Clears the queue of roles to be deleted.")
-@commands.has_role('Administrator')
+@commands.has_permissions(administrator = True)
 async def clear_delete_queue(ctx):
     DELETE_QUEUE.clear()
     await ctx.send("Cleared delete queue.")
 
 
 @client.command(name="clear_create_queue", help="Clears the queue of roles to be created.")
-@commands.has_role('Administrator')
+@commands.has_permissions(administrator = True)
 async def clear_create_queue(ctx):
     CREATE_QUEUE.clear()
     await ctx.send("Cleared create queue.")
 
 @client.command(name="execute", help="First deletes all roles to be deleted. Then creates all roles to be created. Remember these roles have no permissions.")
-@commands.has_role('Administrator')
+@commands.has_permissions(administrator = True)
 async def execute_queues(ctx):
     guild = ctx.guild
     error_queue = []
