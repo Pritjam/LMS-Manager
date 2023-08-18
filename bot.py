@@ -8,15 +8,23 @@ from discord.ext import commands
 with open("api_key") as file:
     TOKEN = file.readline().strip()
 
-DELETE_QUEUE = set()
-CREATE_QUEUE = set()
+DELETE_QUEUES = {}
+CREATE_QUEUES = {}
 intents = discord.Intents.all()
 client = commands.Bot(intents=intents, command_prefix="*")
+
+def ensure_queues_exist(guild):
+    if guild not in DELETE_QUEUES:
+        DELETE_QUEUES[guild] = set()
+    if guild not in CREATE_QUEUES:
+        CREATE_QUEUES[guild] = set()
 
 
 @client.command(name="clear_delete_queue", help="Clears the queue of roles to be deleted.")
 @commands.has_permissions(administrator = True)
 async def clear_delete_queue(ctx):
+    ensure_queues_exist(ctx.guild)
+    DELETE_QUEUE = DELETE_QUEUES[ctx.guild]
     DELETE_QUEUE.clear()
     await ctx.send("Cleared delete queue.")
 
@@ -24,12 +32,19 @@ async def clear_delete_queue(ctx):
 @client.command(name="clear_create_queue", help="Clears the queue of roles to be created.")
 @commands.has_permissions(administrator = True)
 async def clear_create_queue(ctx):
+    ensure_queues_exist(ctx.guild)
+    CREATE_QUEUE = CREATE_QUEUES[ctx.guild]
     CREATE_QUEUE.clear()
     await ctx.send("Cleared create queue.")
 
 @client.command(name="execute", help="First deletes all roles to be deleted. Then creates all roles to be created. Remember these roles have no permissions.")
 @commands.has_permissions(administrator = True)
 async def execute_queues(ctx):
+    ensure_queues_exist(ctx.guild)
+    # get queues for this server
+    DELETE_QUEUE = DELETE_QUEUES[ctx.guild]
+    CREATE_QUEUE = CREATE_QUEUES[ctx.guild]
+
     guild = ctx.guild
     error_queue = []
     while len(DELETE_QUEUE) > 0:
@@ -72,6 +87,8 @@ async def execute_queues(ctx):
 @client.command(name="dqa", help="Adds role(s) to the delete queue. Multiple roles can be specified in a comment separated list.")
 @commands.has_permissions(administrator = True)
 async def add_del_role(ctx, *, roles : str):
+    ensure_queues_exist(ctx.guild)
+    DELETE_QUEUE = DELETE_QUEUES[ctx.guild]
     role_ids = []
     roles = roles.split(",")
     for role_mention in roles:
@@ -86,6 +103,8 @@ async def add_del_role(ctx, *, roles : str):
 @client.command(name="cqa", help="Adds role(s) to the create queue. Multiple roles can be specified in a comment separated list.")
 @commands.has_permissions(administrator = True)
 async def add_create_role(ctx, *, roles : str):
+    ensure_queues_exist(ctx.guild)
+    CREATE_QUEUE = CREATE_QUEUES[ctx.guild]
     roles = [role_name.strip(" \n\t") for role_name in roles.split(',')]
     CREATE_QUEUE.update(roles)
     await ctx.send("Added role(s) `%s` to create queue" % roles)
@@ -93,6 +112,9 @@ async def add_create_role(ctx, *, roles : str):
 @client.command(name="list", help="Displays the delete and create queues")
 @commands.has_permissions(administrator = True)
 async def list_queues(ctx):
+    ensure_queues_exist(ctx.guild)
+    DELETE_QUEUE = DELETE_QUEUES[ctx.guild]
+    CREATE_QUEUE = CREATE_QUEUES[ctx.guild]
     await ctx.send("To delete: %s\n To create: %s" % (["<@&" + str(id) + ">" for id in DELETE_QUEUE], str(CREATE_QUEUE)))
 
 @client.event
