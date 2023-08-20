@@ -90,7 +90,7 @@ async def add_del_role(ctx, *, roles : str):
     ensure_queues_exist(ctx.guild)
     DELETE_QUEUE = DELETE_QUEUES[ctx.guild]
     role_ids = []
-    roles = roles.split(",")
+    roles = roles.split(";")
     for role_mention in roles:
         stripped = role_mention.strip(" \n\t@<>&")
         try:
@@ -105,7 +105,7 @@ async def add_del_role(ctx, *, roles : str):
 async def add_create_role(ctx, *, roles : str):
     ensure_queues_exist(ctx.guild)
     CREATE_QUEUE = CREATE_QUEUES[ctx.guild]
-    roles = [role_name.strip(" \n\t") for role_name in roles.split(',')]
+    roles = [role_name.strip(" \n\t") for role_name in roles.split(';')]
     CREATE_QUEUE.update(roles)
     await ctx.send("Added role(s) `%s` to create queue" % roles)
 
